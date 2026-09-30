@@ -168,6 +168,13 @@ jobs:
               "${plugin_args[@]}" \
               --output appimage
           )
+          image="appimage/Redumper-GUI-Linux-${{ matrix.arch }}.AppImage"
+          zsync="${image}.zsync"
+          if [ ! -s "$image" ] || [ ! -s "$zsync" ]; then
+            echo "AppImage packaging did not produce nonempty ${image} and ${zsync}" >&2
+            ls -l appimage >&2 || true
+            exit 1
+          fi
 
       - name: Upload artifact
         if: github.event_name == 'push'
@@ -224,14 +231,13 @@ jobs:
           for dir in */; do
             name="${dir%/}"
             if [[ "$name" == *"AppImage"* ]]; then
-              shopt -s nullglob
-              files=("$name"/*.AppImage "$name"/*.zsync)
-              shopt -u nullglob
-              if [ ${#files[@]} -eq 0 ]; then
-                echo "No AppImage files in $name"
+              image=("$name"/*.AppImage)
+              zsync=("$name"/*.zsync)
+              if [ ! -s "${image[0]}" ] || [ ! -s "${zsync[0]}" ]; then
+                echo "AppImage artifact $name is missing a nonempty .AppImage or .zsync"
                 exit 1
               fi
-              cp "${files[@]}" ../release/
+              cp "${image[0]}" "${zsync[0]}" ../release/
             elif [[ "$name" == *"Linux"* ]]; then
               chmod +x "$name"/redumper "$name"/redumper-gui
               tar -czf "../release/${name}.tar.gz" -C "$name" .

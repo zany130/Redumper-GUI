@@ -631,14 +631,25 @@ pub fn run_redumper(
         return;
     }
 
+    // Resolve redumper before marking the dump as running. AppImage launchers can
+    // make current_exe() point at the .AppImage, so this must use the same lookup
+    // as startup.
+    let Some(name) = crate::find_redumper() else {
+        rfd::MessageDialog::new()
+            .set_title("Error")
+            .set_description(
+                "'redumper' executable not found.\n\nPlease place the redumper executable in the same folder as this program.",
+            )
+            .set_level(rfd::MessageLevel::Error)
+            .set_buttons(rfd::MessageButtons::Ok)
+            .show();
+        return;
+    };
+
     // Lock UI elements during dump
     *state.running.lock().unwrap() = true;
 
     thread::spawn(move || {
-        // Prepare the redumper command
-        let dir = std::env::current_exe().unwrap().parent().unwrap().to_path_buf();
-        let name = dir.join(if cfg!(windows) { "redumper.exe" } else { "redumper" });
-
         // Ensure redumper is executable
         #[cfg(unix)]
         {
