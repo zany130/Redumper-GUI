@@ -109,12 +109,81 @@ jobs:
             chmod +x bundle/redumper bundle/redumper-gui
           fi
 
+      - name: Build AppImage
+        if: runner.os == 'Linux'
+        run: |
+          set -euo pipefail
+          case "${{ matrix.arch }}" in
+            x64) ARCH=x86_64 ;;
+            arm64) ARCH=aarch64 ;;
+            *) echo "Unsupported AppImage arch: ${{ matrix.arch }}" >&2; exit 1 ;;
+          esac
+          export ARCH
+          export APPIMAGE_EXTRACT_AND_RUN=1
+          export UPDATE_INFORMATION="gh-releases-zsync|Deterous|Redumper-GUI|latest|Redumper-GUI-Linux-${{ matrix.arch }}.AppImage.zsync"
+
+          sudo apt-get update
+          sudo apt-get install -y dpkg-dev pkg-config librsvg2-dev gobject-introspection libgdk-pixbuf-2.0-dev
+
+          tools="${RUNNER_TEMP}/linuxdeploy-tools"
+          mkdir -p "$tools"
+          curl -fsSL -o "$tools/linuxdeploy-${ARCH}.AppImage" \
+            "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-${ARCH}.AppImage"
+          curl -fsSL -o "$tools/linuxdeploy-plugin-gtk.sh" \
+            "https://raw.githubusercontent.com/linuxdeploy/linuxdeploy-plugin-gtk/master/linuxdeploy-plugin-gtk.sh"
+          chmod +x "$tools/linuxdeploy-${ARCH}.AppImage" "$tools/linuxdeploy-plugin-gtk.sh"
+          export PATH="$tools:${PATH}"
+
+          work="${RUNNER_TEMP}/appimage-build"
+          mkdir -p "$work/AppDir/usr/bin" \
+            "$work/AppDir/usr/share/metainfo" \
+            "$work/AppDir/usr/share/icons/hicolor/512x512/apps"
+          curl -fsSL -o redumper.zip \
+            "https://github.com/superg/redumper/releases/download/${{ env.REDUMPER_VERSION }}/redumper-${{ env.REDUMPER_VERSION }}-${{ matrix.platform }}-${{ matrix.arch }}.zip"
+          rm -rf redumper_appimage_tmp
+          unzip redumper.zip -d redumper_appimage_tmp/
+          cp "target/${{ matrix.target }}/release/redumper-gui" "$work/AppDir/usr/bin/"
+          cp "redumper_appimage_tmp/redumper-${{ env.REDUMPER_VERSION }}-${{ matrix.platform }}-${{ matrix.arch }}/bin/redumper" "$work/AppDir/usr/bin/"
+          chmod +x "$work/AppDir/usr/bin/redumper-gui" "$work/AppDir/usr/bin/redumper"
+          cp packaging/appimage/com.redumper.gui.metainfo.xml "$work/AppDir/usr/share/metainfo/"
+          cp assets/icon/icon.png "$work/AppDir/usr/share/icons/hicolor/512x512/apps/com.redumper.gui.png"
+          cp assets/icon/icon.png "$work/com.redumper.gui.png"
+
+          plugin_args=()
+          # rfd's default Linux backend talks to xdg-desktop-portal and does not link GTK.
+          # Bundle GTK only when this build actually links libgtk-3.
+          if ldd "$work/AppDir/usr/bin/redumper-gui" | grep -q 'libgtk-3\.so'; then
+            plugin_args+=(--plugin gtk)
+            export DEPLOY_GTK_VERSION=3
+          fi
+
+          mkdir -p appimage
+          (
+            cd appimage
+            export OUTPUT="Redumper-GUI-Linux-${{ matrix.arch }}.AppImage"
+            linuxdeploy-${ARCH}.AppImage \
+              --appdir "$work/AppDir" \
+              --desktop-file "$GITHUB_WORKSPACE/packaging/appimage/com.redumper.gui.desktop" \
+              --icon-file "$work/com.redumper.gui.png" \
+              "${plugin_args[@]}" \
+              --output appimage
+          )
+
       - name: Upload artifact
         if: github.event_name == 'push'
         uses: actions/upload-artifact@v7
         with:
           name: Redumper-GUI-${{ matrix.output_os }}-${{ matrix.arch }}
           path: bundle/
+
+      - name: Upload AppImage
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v7
+        with:
+          name: Redumper-GUI-${{ matrix.output_os }}-${{ matrix.arch }}-AppImage
+          path: |
+            appimage/*.AppImage
+            appimage/*.zsync
 
   release:
     if: github.event_name == 'push'
@@ -154,7 +223,16 @@ jobs:
           cd artifacts
           for dir in */; do
             name="${dir%/}"
-            if [[ "$name" == *"Linux"* ]]; then
+            if [[ "$name" == *"AppImage"* ]]; then
+              shopt -s nullglob
+              files=("$name"/*.AppImage "$name"/*.zsync)
+              shopt -u nullglob
+              if [ ${#files[@]} -eq 0 ]; then
+                echo "No AppImage files in $name"
+                exit 1
+              fi
+              cp "${files[@]}" ../release/
+            elif [[ "$name" == *"Linux"* ]]; then
               chmod +x "$name"/redumper "$name"/redumper-gui
               tar -czf "../release/${name}.tar.gz" -C "$name" .
             elif [[ "$name" == *"macOS"* ]]; then
@@ -180,6 +258,8 @@ jobs:
             **[Download for Windows (64bit)](https://github.com/${{ github.repository }}/releases/download/v${{ steps.version.outputs.version }}/Redumper-GUI-Windows-x64.zip)**
 
             **[Download for Linux (64bit)](https://github.com/${{ github.repository }}/releases/download/v${{ steps.version.outputs.version }}/Redumper-GUI-Linux-x64.tar.gz)**
+
+            **[Download AppImage for Linux (64bit)](https://github.com/${{ github.repository }}/releases/download/v${{ steps.version.outputs.version }}/Redumper-GUI-Linux-x64.AppImage)**
 
             **[Download for macOS (Apple Silicon)](https://github.com/${{ github.repository }}/releases/download/v${{ steps.version.outputs.version }}/Redumper-GUI-macOS-arm64.dmg)**
 
