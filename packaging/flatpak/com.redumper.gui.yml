@@ -1,0 +1,67 @@
+# Flathub submission: replace the redumper-gui "type: dir" source with a git
+# tag and commit of a release that contains this packaging, and keep
+# cargo-sources.json beside the manifest.
+app-id: com.redumper.gui
+runtime: org.freedesktop.Platform
+runtime-version: '25.08'
+sdk: org.freedesktop.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.rust-stable
+  - org.freedesktop.Sdk.Extension.llvm22
+command: redumper-gui
+finish-args:
+  - --share=ipc
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --device=dri
+  # redumper needs raw SCSI generic and sr devices to dump optical discs.
+  # There is no portal for that.
+  - --device=all
+  - --filesystem=home
+modules:
+  - name: redumper
+    buildsystem: cmake-ninja
+    build-options:
+      append-path: /usr/lib/sdk/llvm22/bin
+      env:
+        CC: clang
+        CXX: clang++
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DCMAKE_C_COMPILER=clang
+      - -DCMAKE_CXX_COMPILER=clang++
+      - -DREDUMPER_VERSION_BUILD=b750
+      # The upstream Linux toolchain links with -static. The SDK has no
+      # static libc, so link the runtime instead.
+      - "-DREDUMPER_LINKER_FLAGS:STRING="
+      - -DFETCHCONTENT_SOURCE_DIR_GOOGLETEST=/run/build/redumper/googletest
+      - -DFETCHCONTENT_FULLY_DISCONNECTED=ON
+    sources:
+      - type: git
+        url: https://github.com/superg/redumper.git
+        tag: b750
+        commit: 1704af30f951c77ff05e739cfa6d7027e66b2507
+      - type: git
+        url: https://github.com/google/googletest.git
+        tag: v1.15.2
+        commit: b514bdc898e2951020cbdca1304b75f5950d1f59
+        dest: googletest
+
+  - name: redumper-gui
+    buildsystem: simple
+    build-options:
+      append-path: /usr/lib/sdk/rust-stable/bin
+      env:
+        CARGO_HOME: /run/build/redumper-gui/cargo
+        CARGO_NET_OFFLINE: "true"
+    build-commands:
+      - cargo --offline fetch --manifest-path Cargo.toml --verbose
+      - cargo --offline build --release --verbose
+      - install -Dm755 target/release/redumper-gui /app/bin/redumper-gui
+      - install -Dm644 packaging/flatpak/com.redumper.gui.desktop /app/share/applications/com.redumper.gui.desktop
+      - install -Dm644 packaging/flatpak/com.redumper.gui.metainfo.xml /app/share/metainfo/com.redumper.gui.metainfo.xml
+      - install -Dm644 assets/icon/icon.png /app/share/icons/hicolor/512x512/apps/com.redumper.gui.png
+    sources:
+      - type: dir
+        path: ../..
+      - cargo-sources.json

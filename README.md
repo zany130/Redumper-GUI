@@ -28,6 +28,17 @@ tar -xzf Redumper-GUI-Linux-x64.tar.gz -C ~/Redumper-GUI
 ~/Redumper-GUI/redumper-gui
 ```
 
+#### Flatpak
+
+Build and install from a clone of this repository:
+
+```sh
+flatpak install -y flathub org.freedesktop.Platform//25.08 org.freedesktop.Sdk//25.08 org.freedesktop.Sdk.Extension.rust-stable//25.08 org.freedesktop.Sdk.Extension.llvm22//25.08
+flatpak-builder --install --force-clean build packaging/flatpak/com.redumper.gui.yml
+```
+
+The sandbox can read and write your home directory. Dumps default to `Downloads/Dumps`. Dumping a disc needs access to `/dev/sg*` and `/dev/sr*`, the same `cdrom` group membership as the tarball. A Flatpak install cannot run a host `MPF.Check` binary.
+
 ### macOS
 
 Open the dmg file in Finder, and move `Redumper GUI.app` to the Applications folder. After attempting to open the .app, macOS will warn you it could not verify the app as it is self-signed, go to the bottom of the "Privacy & Security" settings page where it says "Redumper GUI" was blocked to protect your Mac, then click 'Open Anyway' and try again.

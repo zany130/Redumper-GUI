@@ -42,6 +42,7 @@ fn main() -> eframe::Result {
             .with_inner_size([800.0, 600.0])
             .with_min_inner_size([480.0, 360.0])
             .with_icon(std::sync::Arc::new(load_icon()))
+            .with_app_id("com.redumper.gui")
             .with_decorations(true),
         multisampling: 0,
         depth_buffer: 0,

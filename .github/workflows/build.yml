@@ -186,3 +186,27 @@ jobs:
             For other systems, see the downloads below.
           files: release/*
           make_latest: true
+
+  flatpak:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Flatpak
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y flatpak flatpak-builder
+          sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+          sudo flatpak install -y flathub \
+            org.freedesktop.Platform//25.08 \
+            org.freedesktop.Sdk//25.08 \
+            org.freedesktop.Sdk.Extension.rust-stable//25.08 \
+            org.freedesktop.Sdk.Extension.llvm22//25.08
+
+      - name: Build Flatpak
+        run: |
+          flatpak-builder --disable-rofiles-fuse --force-clean --repo=repo build-dir packaging/flatpak/com.redumper.gui.yml
+          test -x build-dir/files/bin/redumper-gui
+          test -x build-dir/files/bin/redumper
+          echo "redumper and redumper-gui are both installed in /app/bin"
