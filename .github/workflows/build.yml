@@ -120,7 +120,13 @@ jobs:
           esac
           export ARCH
           export APPIMAGE_EXTRACT_AND_RUN=1
-          export UPDATE_INFORMATION="gh-releases-zsync|Deterous|Redumper-GUI|latest|Redumper-GUI-Linux-${{ matrix.arch }}.AppImage.zsync"
+          mkdir -p appimage
+          # Absolute paths: with APPIMAGE_EXTRACT_AND_RUN the packager's working
+          # directory is a temp dir that is deleted on exit.
+          export LDAI_OUTPUT="${GITHUB_WORKSPACE}/appimage/Redumper-GUI-Linux-${{ matrix.arch }}.AppImage"
+          export LDAI_UPDATE_INFORMATION="gh-releases-zsync|Deterous|Redumper-GUI|latest|Redumper-GUI-Linux-${{ matrix.arch }}.AppImage.zsync"
+          export OUTPUT="$LDAI_OUTPUT"
+          export UPDATE_INFORMATION="$LDAI_UPDATE_INFORMATION"
 
           sudo apt-get update
           sudo apt-get install -y dpkg-dev pkg-config librsvg2-dev gobject-introspection libgdk-pixbuf-2.0-dev
@@ -157,19 +163,19 @@ jobs:
             export DEPLOY_GTK_VERSION=3
           fi
 
-          mkdir -p appimage
-          (
-            cd appimage
-            export OUTPUT="Redumper-GUI-Linux-${{ matrix.arch }}.AppImage"
-            linuxdeploy-${ARCH}.AppImage \
-              --appdir "$work/AppDir" \
-              --desktop-file "$GITHUB_WORKSPACE/packaging/appimage/com.redumper.gui.desktop" \
-              --icon-file "$work/com.redumper.gui.png" \
-              "${plugin_args[@]}" \
-              --output appimage
-          )
-          image="appimage/Redumper-GUI-Linux-${{ matrix.arch }}.AppImage"
+          linuxdeploy-${ARCH}.AppImage \
+            --appdir "$work/AppDir" \
+            --desktop-file "$GITHUB_WORKSPACE/packaging/appimage/com.redumper.gui.desktop" \
+            --icon-file "$work/com.redumper.gui.png" \
+            "${plugin_args[@]}" \
+            --output appimage
+          image="${LDAI_OUTPUT}"
           zsync="${image}.zsync"
+          # zsyncmake writes <basename>.zsync in the job directory, not beside an absolute AppImage path.
+          side_zsync="${PWD}/$(basename "$image").zsync"
+          if [ ! -s "$zsync" ] && [ -s "$side_zsync" ]; then
+            mv "$side_zsync" "$zsync"
+          fi
           if [ ! -s "$image" ] || [ ! -s "$zsync" ]; then
             echo "AppImage packaging did not produce nonempty ${image} and ${zsync}" >&2
             ls -l appimage >&2 || true
