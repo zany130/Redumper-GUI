@@ -33,6 +33,7 @@ tar -xzf Redumper-GUI-Linux-x64.tar.gz -C ~/Redumper-GUI
 Build and install from a clone of this repository:
 
 ```sh
+flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 flatpak install -y flathub org.freedesktop.Platform//25.08 org.freedesktop.Sdk//25.08 org.freedesktop.Sdk.Extension.rust-stable//25.08 org.freedesktop.Sdk.Extension.llvm22//25.08
 flatpak-builder --install --force-clean build packaging/flatpak/com.redumper.gui.yml
 ```
