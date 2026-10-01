@@ -151,9 +151,9 @@ jobs:
           cp "target/${{ matrix.target }}/release/redumper-gui" "$work/AppDir/usr/bin/"
           cp "redumper_appimage_tmp/redumper-${{ env.REDUMPER_VERSION }}-${{ matrix.platform }}-${{ matrix.arch }}/bin/redumper" "$work/AppDir/usr/bin/"
           chmod +x "$work/AppDir/usr/bin/redumper-gui" "$work/AppDir/usr/bin/redumper"
-          cp packaging/appimage/com.redumper.gui.metainfo.xml "$work/AppDir/usr/share/metainfo/"
-          cp assets/icon/icon.png "$work/AppDir/usr/share/icons/hicolor/512x512/apps/com.redumper.gui.png"
-          cp assets/icon/icon.png "$work/com.redumper.gui.png"
+          cp packaging/appimage/io.github.deterous.redumper-gui.metainfo.xml "$work/AppDir/usr/share/metainfo/"
+          cp assets/icon/icon.png "$work/AppDir/usr/share/icons/hicolor/512x512/apps/io.github.deterous.redumper-gui.png"
+          cp assets/icon/icon.png "$work/io.github.deterous.redumper-gui.png"
 
           plugin_args=()
           # rfd's default Linux backend talks to xdg-desktop-portal and does not link GTK.
@@ -165,8 +165,8 @@ jobs:
 
           linuxdeploy-${ARCH}.AppImage \
             --appdir "$work/AppDir" \
-            --desktop-file "$GITHUB_WORKSPACE/packaging/appimage/com.redumper.gui.desktop" \
-            --icon-file "$work/com.redumper.gui.png" \
+            --desktop-file "$GITHUB_WORKSPACE/packaging/appimage/io.github.deterous.redumper-gui.desktop" \
+            --icon-file "$work/io.github.deterous.redumper-gui.png" \
             "${plugin_args[@]}" \
             --output appimage
           image="${LDAI_OUTPUT}"
