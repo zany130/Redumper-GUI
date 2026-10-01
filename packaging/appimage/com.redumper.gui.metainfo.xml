@@ -1,54 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>com.redumper.gui</id>
+  <id>io.github.deterous.redumper-gui</id>
+
   <name>Redumper GUI</name>
-  <summary>GUI for redump disc dumping</summary>
-  <metadata_license>CC0-1.0</metadata_license>
+  <summary>Dump optical discs with a graphical interface</summary>
+
+  <metadata_license>MIT</metadata_license>
   <project_license>GPL-3.0-only</project_license>
-  <developer id="com.redumper">
+
+  <developer id="io.github.deterous">
     <name>Deterous</name>
   </developer>
-  <launchable type="desktop-id">com.redumper.gui.desktop</launchable>
-  <url type="homepage">https://github.com/Deterous/Redumper-GUI</url>
-  <url type="bugtracker">https://github.com/Deterous/Redumper-GUI/issues</url>
-  <url type="vcs-browser">https://github.com/Deterous/Redumper-GUI</url>
-  <content_rating type="oars-1.1">
-    <content_attribute id="violence-cartoon">none</content_attribute>
-    <content_attribute id="violence-fantasy">none</content_attribute>
-    <content_attribute id="violence-realistic">none</content_attribute>
-    <content_attribute id="violence-bloodshed">none</content_attribute>
-    <content_attribute id="violence-sexual">none</content_attribute>
-    <content_attribute id="violence-desecration">none</content_attribute>
-    <content_attribute id="violence-slavery">none</content_attribute>
-    <content_attribute id="violence-worship">none</content_attribute>
-    <content_attribute id="drugs-alcohol">none</content_attribute>
-    <content_attribute id="drugs-narcotics">none</content_attribute>
-    <content_attribute id="drugs-tobacco">none</content_attribute>
-    <content_attribute id="sex-nudity">none</content_attribute>
-    <content_attribute id="sex-themes">none</content_attribute>
-    <content_attribute id="sex-homosexuality">none</content_attribute>
-    <content_attribute id="sex-prostitution">none</content_attribute>
-    <content_attribute id="sex-adultery">none</content_attribute>
-    <content_attribute id="sex-appearance">none</content_attribute>
-    <content_attribute id="language-profanity">none</content_attribute>
-    <content_attribute id="language-humor">none</content_attribute>
-    <content_attribute id="language-discrimination">none</content_attribute>
-    <content_attribute id="social-chat">none</content_attribute>
-    <content_attribute id="social-info">none</content_attribute>
-    <content_attribute id="social-audio">none</content_attribute>
-    <content_attribute id="social-location">none</content_attribute>
-    <content_attribute id="social-contacts">none</content_attribute>
-    <content_attribute id="money-purchasing">none</content_attribute>
-    <content_attribute id="money-gambling">none</content_attribute>
-  </content_rating>
+
   <description>
     <p>
-      Redumper GUI is a desktop interface for redumper, a low-level optical disc dumper used for redump submissions.
+      Redumper GUI provides a graphical interface for redumper,
+      a command-line tool for dumping optical discs.
     </p>
     <p>
-      The AppImage bundles a supported redumper build. It can run MPF.Check after a dump when that program is available on PATH or beside the executable.
+      This appimage includes the redumper version selected by the
+      upstream developer for this release.
+    </p>
+    <p>
+      This is an unofficial AppImage package maintained by zany130.
+      Packaging issues should be reported to the Flatpak repository.
     </p>
   </description>
+
+  <launchable type="desktop-id">io.github.deterous.redumper-gui.desktop</launchable>
+
+  <url type="homepage">https://github.com/Deterous/Redumper-GUI</url>
+  <url type="vcs-browser">https://github.com/Deterous/Redumper-GUI</url>
+  <url type="bugtracker">https://github.com/zany130/io.github.deterous.redumper-gui/issues</url>
+
+  <content_rating type="oars-1.1"/>
   <screenshots>
     <screenshot type="default">
       <image>https://github.com/user-attachments/assets/59947cca-3d63-4b79-9282-861a2061d7a4</image>
