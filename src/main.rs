@@ -19,18 +19,9 @@ fn load_icon() -> egui::IconData {
 // Get the path to co-located redumper executable
 pub fn find_redumper() -> Option<std::path::PathBuf> {
     let name = if cfg!(windows) { "redumper.exe" } else { "redumper" };
-    let beside_exe = std::env::current_exe()
-        .ok()
-        .and_then(|exe| exe.parent().map(|dir| dir.join(name)))
-        .filter(|path| path.exists());
-    if beside_exe.is_some() {
-        return beside_exe;
-    }
-    // Some AppImage launchers make current_exe() point at the .AppImage file.
-    std::env::var_os("APPDIR").and_then(|appdir| {
-        let path = std::path::PathBuf::from(appdir).join("usr/bin").join(name);
-        path.exists().then_some(path)
-    })
+    let dir = std::env::current_exe().ok()?.parent()?.to_path_buf();
+    let path = dir.join(name);
+    path.exists().then_some(path)
 }
 
 fn main() -> eframe::Result {
@@ -51,7 +42,6 @@ fn main() -> eframe::Result {
             .with_inner_size([800.0, 600.0])
             .with_min_inner_size([480.0, 360.0])
             .with_icon(std::sync::Arc::new(load_icon()))
-            .with_app_id("com.redumper.gui")
             .with_decorations(true),
         multisampling: 0,
         depth_buffer: 0,
