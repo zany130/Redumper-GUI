@@ -114,10 +114,18 @@ jobs:
         run: |
           set -euo pipefail
           case "${{ matrix.arch }}" in
-            x64) ARCH=x86_64 ;;
-            arm64) ARCH=aarch64 ;;
+            x64)
+              ARCH=x86_64
+              LINUXDEPLOY_SHA256=36a2d7e274d12e1050d0e9ecfe11d339ed54720b2bec464c286d53f8b07f5c62
+              ;;
+            arm64)
+              ARCH=aarch64
+              LINUXDEPLOY_SHA256=556ab80baa98e600aa80f0dcedfb70bca0e1ce7e9f147fb345be3fcc3e91b2b1
+              ;;
             *) echo "Unsupported AppImage arch: ${{ matrix.arch }}" >&2; exit 1 ;;
           esac
+          GTK_PLUGIN_COMMIT=3b67a1d1c1b0c8268f57f2bce40fe2d33d409cea
+          GTK_PLUGIN_SHA256=b0f4cbc684a0103a9651f0955b635eaea0096b3a66c0f5a2c2aa337960375171
           export ARCH
           export APPIMAGE_EXTRACT_AND_RUN=1
           mkdir -p appimage
@@ -136,7 +144,9 @@ jobs:
           curl -fsSL -o "$tools/linuxdeploy-${ARCH}.AppImage" \
             "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-${ARCH}.AppImage"
           curl -fsSL -o "$tools/linuxdeploy-plugin-gtk.sh" \
-            "https://raw.githubusercontent.com/linuxdeploy/linuxdeploy-plugin-gtk/master/linuxdeploy-plugin-gtk.sh"
+            "https://raw.githubusercontent.com/linuxdeploy/linuxdeploy-plugin-gtk/${GTK_PLUGIN_COMMIT}/linuxdeploy-plugin-gtk.sh"
+          printf '%s  %s\n' "$LINUXDEPLOY_SHA256" "$tools/linuxdeploy-${ARCH}.AppImage" | sha256sum --check
+          printf '%s  %s\n' "$GTK_PLUGIN_SHA256" "$tools/linuxdeploy-plugin-gtk.sh" | sha256sum --check
           chmod +x "$tools/linuxdeploy-${ARCH}.AppImage" "$tools/linuxdeploy-plugin-gtk.sh"
           export PATH="$tools:${PATH}"
 
