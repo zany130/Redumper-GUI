@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.deterous.redumper-gui</id>
+
+  <name>Redumper GUI</name>
+  <summary>Dump optical discs with a graphical interface</summary>
+
+  <metadata_license>MIT</metadata_license>
+  <project_license>GPL-3.0-only</project_license>
+
+  <developer id="io.github.deterous">
+    <name>Deterous</name>
+  </developer>
+
+  <description>
+    <p>
+      Redumper GUI provides a graphical interface for redumper,
+      a command-line tool for dumping optical discs.
+    </p>
+    <p>
+      This appimage includes the redumper version selected by the
+      upstream developer for this release.
+    </p>
+    <p>
+      This is an unofficial AppImage package maintained by zany130.
+      Packaging issues should be reported to the Flatpak repository.
+    </p>
+  </description>
+
+  <launchable type="desktop-id">io.github.deterous.redumper-gui.desktop</launchable>
+
+  <url type="homepage">https://github.com/Deterous/Redumper-GUI</url>
+  <url type="vcs-browser">https://github.com/Deterous/Redumper-GUI</url>
+  <url type="bugtracker">https://github.com/zany130/io.github.deterous.redumper-gui/issues</url>
+
+  <content_rating type="oars-1.1"/>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://github.com/user-attachments/assets/59947cca-3d63-4b79-9282-861a2061d7a4</image>
+    </screenshot>
+  </screenshots>
+  <releases>
+    <release version="1.0.6" date="2026-09-10"/>
+  </releases>
+</component>

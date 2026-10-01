@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Redumper GUI
+Comment=GUI for redump disc dumping
+Exec=redumper-gui
+Icon=io.github.deterous.redumper-gui
+Terminal=false
+Categories=Utility;
+Keywords=redump;cd;dvd;bluray;disc;dump;
+StartupWMClass=redumper-gui

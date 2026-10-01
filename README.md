@@ -28,6 +28,17 @@ tar -xzf Redumper-GUI-Linux-x64.tar.gz -C ~/Redumper-GUI
 ~/Redumper-GUI/redumper-gui
 ```
 
+#### AppImage
+
+Download `Redumper-GUI-Linux-x64.AppImage` (or the arm64 build) from the [Releases](../../releases/latest) page, mark it executable, and run it. The image includes both `redumper-gui` and `redumper`.
+
+```sh
+chmod +x Redumper-GUI-Linux-x64.AppImage
+./Redumper-GUI-Linux-x64.AppImage
+```
+
+[Gear Lever](https://github.com/mijorus/gearlever) and [AM](https://github.com/ivan-hc/AM) can install the AppImage and keep it updated. Each release also includes a `.zsync` file for AppImageUpdate.
+
 ### macOS
 
 Open the dmg file in Finder, and move `Redumper GUI.app` to the Applications folder. After attempting to open the .app, macOS will warn you it could not verify the app as it is self-signed, go to the bottom of the "Privacy & Security" settings page where it says "Redumper GUI" was blocked to protect your Mac, then click 'Open Anyway' and try again.
